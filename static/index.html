@@ -1,1 +1,79 @@
 
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeepClip AI Recap</title>
+<style>
+:root{--purple:#5846e8;--ink:#202033;--muted:#74768b;--bg:#f4f5fb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Noto Sans Myanmar",sans-serif;color:var(--ink)}
+header{background:#fff;padding:15px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #e9e9f2;position:sticky;top:0}
+.logo{width:42px;height:42px;border-radius:12px;background:#171722;color:#fff;display:grid;place-items:center;font-weight:900;font-size:22px}
+.brand{font-weight:850;font-size:20px}.tag{margin-left:auto;color:var(--muted);font-size:12px}
+main{max-width:760px;margin:22px auto;padding:0 14px 40px}.panel{background:#fff;border-radius:24px;padding:22px;margin-bottom:16px;box-shadow:0 5px 24px #2222}
+h1{font-size:25px;margin:0 0 8px}h2{font-size:18px;margin:0 0 14px}.muted{color:var(--muted);font-size:14px;line-height:1.7}
+.drop{border:2px dashed #c9c6f7;border-radius:20px;background:#f8f7ff;padding:24px 16px;text-align:center}
+.drop .up{font-size:36px;color:var(--purple)}input[type=file]{max-width:100%;margin-top:12px}
+label{display:block;font-weight:700;margin:15px 0 7px;font-size:14px}input[type=text],select,input[type=number]{width:100%;padding:14px;border:1px solid #dedfea;border-radius:14px;font:inherit;background:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{border:0;border-radius:14px;background:var(--purple);color:#fff;font:inherit;font-weight:800;padding:14px 18px;cursor:pointer;width:100%;margin-top:18px}.btn:disabled{opacity:.55;cursor:wait}
+.status{display:none;margin-top:16px;background:#f6f5ff;border-radius:16px;padding:15px}.bar{height:8px;background:#dedcfb;border-radius:9px;overflow:hidden;margin:12px 0}.bar span{display:block;height:100%;width:0;background:var(--purple);transition:width .3s}
+.summary{white-space:pre-wrap;line-height:1.8;background:#fafaff;padding:14px;border-radius:12px}.download{display:inline-block;text-decoration:none;background:#1b1b29;color:#fff;padding:12px 16px;border-radius:12px;font-weight:800;margin-top:10px}
+.note{font-size:12px;color:var(--muted);line-height:1.7;margin-top:12px}
+@media(max-width:520px){main{margin:12px auto}.panel{padding:17px}.row{grid-template-columns:1fr}.brand{font-size:18px}}
+</style>
+</head>
+<body>
+<header><div class="logo">▶</div><div class="brand">DeepClip AI</div><div class="tag">Video Recap Studio</div></header>
+<main>
+<section class="panel">
+<h1>Video Recap ဖန်တီးမယ်</h1><div class="muted">Video တင်ပါ၊ AI က အဓိကအပိုင်းတွေကို ရွေးပြီး မြန်မာစာတန်းထိုး MP4 ပြုလုပ်ပေးပါမယ်။</div>
+<form id="jobForm">
+<div class="drop" style="margin-top:18px"><div class="up">⇧</div><strong>Video ဖိုင်ရွေးပါ</strong><div class="muted">MP4, MOV, MKV, WEBM</div><input type="file" id="video" name="video" accept="video/mp4,video/quicktime,video/x-matroska,video/webm"></div>
+<label for="url">သို့မဟုတ် YouTube / TikTok Link</label><input type="text" id="url" name="url" placeholder="https://youtube.com/...">
+<div class="row">
+<div><label for="aspect">Video အချိုးအစား</label><select id="aspect" name="aspect"><option>9:16</option><option>16:9</option><option>1:1</option><option>3:4</option></select></div>
+<div><label for="target">Recap ကြာချိန် (စက္ကန့်)</label><select id="target" name="target_seconds"><option value="30">30 စက္ကန့်</option><option value="60" selected>60 စက္ကန့်</option><option value="90">90 စက္ကန့်</option><option value="120">120 စက္ကန့်</option><option value="180">180 စက္ကန့်</option></select></div>
+</div>
+<button class="btn" id="submitBtn" type="submit">✨ AI Recap ဖန်တီးမယ်</button>
+</form>
+<div class="status" id="status"><strong id="statusText">စတင်နေသည်...</strong><div class="bar"><span id="bar"></span></div><div class="muted" id="statusDetail"></div><div id="result"></div></div>
+<div class="note">မှတ်ချက် — AI Recap နဲ့ မြန်မာဘာသာပြန်အတွက် Server မှာ OpenAI API Key ထည့်ထားဖို့လိုပါတယ်။ API Key မရှိလျှင် AI highlight ရွေးချယ်မှုနဲ့ ဘာသာပြန်မှုကို အစားထိုးနည်းဖြင့် ဆောင်ရွက်ပါမယ်။ Video Processing သည် Server CPU/GPU အားနှင့် Video အရှည်ပေါ်မူတည်၍ အချိန်ကြာနိုင်ပါတယ်။</div>
+</section>
+<section class="panel"><h2>အသုံးပြုပုံ</h2><div class="muted">၁။ Video ဖိုင်တင်ပါ သို့မဟုတ် Public Link ထည့်ပါ။<br>၂။ အချိုးအစားနဲ့ Recap အရှည်ကို ရွေးပါ။<br>၃။ AI Recap ဖန်တီးမယ်ကို နှိပ်ပါ။<br>၄။ ပြီးသွားလျှင် MP4 ကို ဒေါင်းလုဒ်လုပ်ပါ။</div></section>
+</main>
+<script>
+const form=document.querySelector('#jobForm'), btn=document.querySelector('#submitBtn'), statusBox=document.querySelector('#status');
+form.addEventListener('submit',async e=>{
+ e.preventDefault();
+ const file=document.querySelector('#video').files[0], url=document.querySelector('#url').value.trim();
+ if(!file&&!url){alert('Video ဖိုင်တင်ပါ သို့မဟုတ် Link ထည့်ပါ။');return}
+ if(file&&url){alert('Video ဖိုင် သို့မဟုတ် Link တစ်ခုကိုသာ အသုံးပြုပါ။');return}
+ const data=new FormData(form); if(!file)data.delete('video'); if(!url)data.delete('url');
+ btn.disabled=true;btn.textContent='လုပ်ဆောင်နေသည်...';statusBox.style.display='block';
+ document.querySelector('#result').innerHTML='';
+ try{
+  const response=await fetch('/api/jobs',{method:'POST',body:data});
+  const payload=await response.json();if(!response.ok)throw new Error(payload.detail||'Request မအောင်မြင်ပါ');
+  await poll(payload.job_id);
+ }catch(err){document.querySelector('#statusText').textContent='အမှားဖြစ်နေသည်';document.querySelector('#statusDetail').textContent=err.message}
+ finally{btn.disabled=false;btn.textContent='✨ AI Recap ဖန်တီးမယ်'}
+});
+async function poll(id){
+ for(let i=0;i<1800;i++){
+  const r=await fetch('/api/jobs/'+id);const j=await r.json();
+  document.querySelector('#statusText').textContent=j.message||j.status;
+  document.querySelector('#bar').style.width=(j.progress||0)+'%';
+  document.querySelector('#statusDetail').textContent='အခြေအနေ: '+j.status+' · '+(j.progress||0)+'%';
+  if(j.status==='done'){
+   const result=document.querySelector('#result');
+   result.innerHTML='<h3>AI Recap အကျဉ်းချုပ်</h3><div class="summary"></div><a class="download" href="'+j.download_url+'">⬇ MP4 ဒေါင်းလုဒ်လုပ်ရန်</a>';
+   result.querySelector('.summary').textContent=j.summary||'Recap ပြီးပါပြီ။';
+   return;
+  }
+  if(j.status==='error')throw new Error(j.error||'Processing မအောင်မြင်ပါ');
+  await new Promise(resolve=>setTimeout(resolve,2500));
+ }
+ throw new Error('အချိန်ကြာလွန်းနေပါတယ်။ Server မှာ Job အခြေအနေကို စစ်ဆေးပါ။');
+}
+</script>
+</body></html>
